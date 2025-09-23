@@ -1,0 +1,11 @@
+# Xcode
+*.xcworkspace
+xcuserdata/
+*.xcuserdatad
+
+# Swift Package Manager
+Packages/
+Package.resolved
+
+# Output folders
+DerivedData/

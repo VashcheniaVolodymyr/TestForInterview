@@ -15,6 +15,7 @@ public protocol APIRequest: URLRequestConvertible {
     var method: HTTPMethod { get }
     var headers: [String: String]? { get }
     var parametrs: Parameters? { get }
+    var requiresAuthentication: Bool { get }
 }
 
 extension APIRequest {
@@ -30,6 +31,10 @@ extension APIRequest {
     func asURLRequest() throws -> URLRequest {
         let urlComponents = NSURLComponents(string: baseURLString + path)
         
+        guard let urlRequest = urlComponents?.url else {
+            throw APIError.buildRequest(.invalidURL)
+        }
+        
         if let parametrsArray = parametrs, !parametrsArray.isEmpty {
             urlComponents?.queryItems = []
             
@@ -39,10 +44,6 @@ extension APIRequest {
             }
         }
         
-        guard let urlRequest = urlComponents?.url else {
-            throw APIError.buildRequest(.invalidURL)
-        }
-        
         var request = try URLRequest(
             url: urlRequest,
             method: method,
@@ -50,6 +51,11 @@ extension APIRequest {
         )
         
         request.httpBody = try body()
+        request.setValue(Headers.applicationJson, forHTTPHeaderField: Headers.accept)
+        
+        if requiresAuthentication {
+            request.setValue(Headers.bearer(token: Helper.apiKey), forHTTPHeaderField: Headers.authorization)
+        }
     
         return request
     }

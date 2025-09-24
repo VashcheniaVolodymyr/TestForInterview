@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class Navigation {
+final class Navigation: Injectable {
     // MARK: Private
     private lazy var window: UIWindow = UIWindow()
     private lazy var currentNavigationController: UINavigationController = .init()

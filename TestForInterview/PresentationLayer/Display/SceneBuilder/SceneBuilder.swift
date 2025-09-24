@@ -14,7 +14,6 @@ protocol SceneBuilderProtocol {
     func buildScene() -> Scene
     var transition: SceneTransitionMethod { get set }
     var transitionStyle: UIModalTransitionStyle? { get set }
-    var withNaviveAnimation: Bool { get set }
 }
 
 extension SceneBuilderProtocol {
@@ -24,15 +23,6 @@ extension SceneBuilderProtocol {
         }
         set {
             transition = newValue
-        }
-    }
-    
-    var withNaviveAnimation: Bool {
-        get {
-            return true
-        }
-        set {
-            withNaviveAnimation = newValue
         }
     }
     

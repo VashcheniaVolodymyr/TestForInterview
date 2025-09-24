@@ -8,7 +8,8 @@
 import Combine
 
 protocol MoviesRepository {
-    func topRated(language: String, page: Int, region: String) -> AnyPublisher<TopRatedList, APIError>
+    func topRated(language: String, page: Int32, region: String) -> AnyPublisher<TopRatedList, APIError>
+    func movieDetails(movieId: Int32, language: String) -> AnyPublisher<MovieDetails, APIError>
 }
 
 final class MoviesRepositoryImpl: MoviesRepository {
@@ -21,9 +22,18 @@ final class MoviesRepositoryImpl: MoviesRepository {
     }
     
     // MARK: Protocol
-    func topRated(language: String, page: Int, region: String) -> AnyPublisher<TopRatedList, APIError> {
-        let endpoint = MoviesAPI.topRated(lanuguage: language, page: page, region: region)
+    func topRated(language: String, page: Int32, region: String) -> AnyPublisher<TopRatedList, APIError> {
+        let endpoint = MoviesAPI.topRated(language: language, page: page, region: region)
         let request = NetworkRequest(request: endpoint, dto: TopRatedListDTO.self)
+        
+        return apiRequestService.publisher(request: request, callbackQueue: .global(qos: .utility))
+            .map { $0.domain() }
+            .eraseToAnyPublisher()
+    }
+    
+    func movieDetails(movieId: Int32, language: String) -> AnyPublisher<MovieDetails, APIError> {
+        let endpoint = MoviesAPI.movieDetails(movieId: movieId, language: language)
+        let request = NetworkRequest(request: endpoint, dto: MovieDetailsDTO.self)
         
         return apiRequestService.publisher(request: request, callbackQueue: .global(qos: .utility))
             .map { $0.domain() }

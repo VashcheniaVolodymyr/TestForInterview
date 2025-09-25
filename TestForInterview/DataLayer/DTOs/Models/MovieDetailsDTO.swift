@@ -8,7 +8,6 @@
 struct MovieDetailsDTO: Responsable, DTOConvertible, DOMAINConvertible {
     let adult: Bool
     let backdrop_path: String
-    let belongs_to_collection: String
     let budget: Int
     let genres: [GenreDTO]
     let homepage: String

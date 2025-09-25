@@ -7,7 +7,7 @@
 
 struct ProductionCompanyDTO: Decodable, DOMAINConvertible {
     let id: Int
-    let logPath: String
+    let logPath: String?
     let name: String
     let origin_country: String
     

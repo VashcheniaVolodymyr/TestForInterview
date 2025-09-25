@@ -4,11 +4,11 @@
 //
 //  Created by Vashchenia Volodymyr on 24.09.2025.
 //
+import Foundation
 
 struct MovieDetails: Hashable {
     let adult: Bool
     let backdropPath: String
-    let belongsToCollection: String
     let budget: Int
     let genres: [Genre]
     let homepage: String
@@ -37,7 +37,6 @@ struct MovieDetails: Hashable {
     init(dto: MovieDetailsDTO) {
         self.adult = dto.adult
         self.backdropPath = dto.backdrop_path
-        self.belongsToCollection = dto.belongs_to_collection
         self.budget = dto.budget
         self.genres = dto.genres.map { $0.domain() }
         self.homepage = dto.homepage
@@ -60,5 +59,17 @@ struct MovieDetails: Hashable {
         self.video = dto.video
         self.voteAverage = dto.vote_average
         self.voteCount = dto.vote_count
+    }
+    
+    func formattedReleaseDate() -> String {
+        if let date = Date.shortDateFormatter.date(from: self.releaseDate) {
+            return Date.longDateFormatter.string(from: date)
+        } else {
+            return releaseDate
+        }
+    }
+    
+    func posterURL() -> URL? {
+        return URL(string: "https://image.tmdb.org/t/p/w500\(posterPath)")
     }
 }

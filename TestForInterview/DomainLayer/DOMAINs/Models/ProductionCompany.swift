@@ -7,7 +7,7 @@
 
 struct ProductionCompany: Hashable {
     let id: Int
-    let logPath: String
+    let logPath: String?
     let name: String
     let originCountry: String
     

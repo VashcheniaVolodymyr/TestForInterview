@@ -11,7 +11,7 @@ extension Scenes {
     static func movieDetails(movieId: Int32) -> any SceneBuilderProtocol {
         struct Scene: SceneBuilderProtocol {
             let movieId: Int32
-            var transition: SceneTransitionMethod = .root(animated: true, option: .transitionCrossDissolve)
+            var transition: SceneTransitionMethod = .push(animated: true)
             
             func buildScene() -> UIViewController {
                 let viewModel = MovieDetailsSceneViewModel(movieId: movieId)

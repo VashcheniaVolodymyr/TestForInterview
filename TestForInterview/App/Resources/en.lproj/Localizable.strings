@@ -9,3 +9,5 @@
 "rating" = "Rating: %@";
 "add_to_favorites" = "Add to favorites";
 "remove_from_favorites" = "Remove from favorites";
+"search" = "Search";
+"search_results" = "Search results (%@)";

@@ -35,6 +35,8 @@ public class BaseNetworkService: NetworkService {
         do {
             let request = try request.asURLRequest()
             
+            print(request)
+            
             return session.dataTaskPublisher(for: request)
                 .tryMap { result -> URLRequest.Response in
                     guard let httpResponse = result.response as? HTTPURLResponse else {
@@ -45,6 +47,7 @@ public class BaseNetworkService: NetworkService {
                         throw APIError.response(.clientError(statusCode: httpResponse.statusCode, data: result.data))
                     }
                     
+                    print(result.data.prettyPrintedJSONString)
                     return (result.data, httpResponse)
                 }
                 .mapError { $0.asAPIError(request: request) }

@@ -8,8 +8,8 @@
 struct TopRatedListDTO: Responsable, DTOConvertible, DOMAINConvertible {
     let page: Int
     let results: [MovieDTO]
-    let totalPages: Int
-    let totalResults: Int
+    let total_pages: Int
+    let total_results: Int
     
     func dto() -> Self {
         return self

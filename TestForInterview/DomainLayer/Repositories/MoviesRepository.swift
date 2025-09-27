@@ -10,6 +10,7 @@ import Combine
 protocol MoviesRepository {
     func topRated(language: String, page: Int32, region: String) -> AnyPublisher<TopRatedList, APIError>
     func movieDetails(movieId: Int32, language: String) -> AnyPublisher<MovieDetails, APIError>
+    func search(query: String, page: Int32, language: String) -> AnyPublisher<SearchMovieList, APIError>
 }
 
 final class MoviesRepositoryImpl: MoviesRepository {
@@ -34,6 +35,15 @@ final class MoviesRepositoryImpl: MoviesRepository {
     func movieDetails(movieId: Int32, language: String) -> AnyPublisher<MovieDetails, APIError> {
         let endpoint = MoviesAPI.movieDetails(movieId: movieId, language: language)
         let request = NetworkRequest(request: endpoint, dto: MovieDetailsDTO.self)
+        
+        return apiRequestService.publisher(request: request, callbackQueue: .global(qos: .utility))
+            .map { $0.domain() }
+            .eraseToAnyPublisher()
+    }
+    
+    func search(query: String, page: Int32, language: String) -> AnyPublisher<SearchMovieList, APIError> {
+        let endpoint = MoviesAPI.search(query: query, page: page, language: language)
+        let request = NetworkRequest(request: endpoint, dto: SearchMovieListDTO.self)
         
         return apiRequestService.publisher(request: request, callbackQueue: .global(qos: .utility))
             .map { $0.domain() }

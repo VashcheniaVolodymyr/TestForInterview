@@ -5,16 +5,18 @@
 //  Created by Vashchenia Volodymyr on 24.09.2025.
 //
 
+import Foundation
+
 struct Movie: Hashable {
     let adult: Bool
-    let backdropPath: String
+    let backdropPath: String?
     let genreIds: [Int]
     let id: Int
     let originalLanguage: String
     let originalTitle: String
     let overview: String
     let popularity: Double
-    let posterPath: String
+    let posterPath: String?
     let releaseDate: String
     let title: String
     let video: Bool
@@ -36,5 +38,21 @@ struct Movie: Hashable {
         self.video = dto.video
         self.voteAverage = dto.vote_average
         self.voteCount = dto.vote_count
+    }
+    
+    func posterURL() -> URL? {
+        guard let posterPath = posterPath else { return nil }
+        return URL(string: "https://image.tmdb.org/t/p/w500\(posterPath)")
+    }
+    
+    func ratingLocalized() -> String {
+        return String(format: NSLocalizedString("rating", comment: ""), voteAverage.description)
+    }
+}
+
+extension Movie: Identifiable { }
+extension Movie: Favorable {
+    var favoralId: String {
+        return "\(id)"
     }
 }

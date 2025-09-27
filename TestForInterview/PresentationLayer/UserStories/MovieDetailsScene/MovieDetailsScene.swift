@@ -52,6 +52,7 @@ struct MovieDetailsScene<ViewModel: MovieDetailsSceneVMP>: View {
                     .foregroundColor(Color.gray.opacity(0.2))
                     .frame(width: 250, height: 377)
             }
+            .id(viewModel.posterURL?.absoluteString)
             
             Text(viewModel.voteAverage)
                 .foregroundColor(Color(.txt))

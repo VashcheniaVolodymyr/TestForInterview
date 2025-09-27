@@ -8,6 +8,7 @@
 enum MoviesAPI {
     case topRated(language: String, page: Int32, region: String)
     case movieDetails(movieId: Int32, language: String)
+    case search(query: String, page: Int32, language: String)
 }
 
 extension MoviesAPI: APIRequest {
@@ -21,6 +22,8 @@ extension MoviesAPI: APIRequest {
             return "api.themoviedb.org/3/movie/top_rated"
         case .movieDetails(movieId: let movieId, _):
             return "api.themoviedb.org/3/movie/\(movieId)"
+        case .search:
+            return "api.themoviedb.org/3/search/movie"
         }
     }
     
@@ -34,6 +37,8 @@ extension MoviesAPI: APIRequest {
             ]
         case .movieDetails(_, let language):
             return ["language": language]
+        case .search(query: let query, page: let page, language: let language):
+            return ["query": query, "page": page, "language": language]
         }
     }
     

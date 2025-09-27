@@ -8,17 +8,17 @@ import Foundation
 
 struct MovieDetails: Hashable {
     let adult: Bool
-    let backdropPath: String
+    let backdropPath: String?
     let budget: Int
     let genres: [Genre]
     let homepage: String
     let id: Int
-    let imdbId: String
+    let imdbId: String?
     let originalLanguage: String
     let originalTitle: String
     let overview: String
     let popularity: Double
-    let posterPath: String
+    let posterPath: String?
     
     let productionCompanies: [ProductionCompany]
     let productionCountries: [ProductionCountry]
@@ -70,6 +70,11 @@ struct MovieDetails: Hashable {
     }
     
     func posterURL() -> URL? {
+        guard let posterPath = posterPath else { return nil }
         return URL(string: "https://image.tmdb.org/t/p/w500\(posterPath)")
     }
+}
+
+extension MovieDetails: Favorable {
+    var favoralId: String { "\(id)"}
 }

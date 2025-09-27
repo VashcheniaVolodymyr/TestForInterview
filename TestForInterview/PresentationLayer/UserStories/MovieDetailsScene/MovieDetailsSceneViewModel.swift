@@ -46,6 +46,7 @@ final class MovieDetailsSceneViewModel: MovieDetailsSceneVMP {
         loadDetails()
     }
     
+    // MARK: Private methods
     private func loadDetails() {
         self.state = .loading
         
@@ -68,10 +69,13 @@ final class MovieDetailsSceneViewModel: MovieDetailsSceneVMP {
     
     private func setUpDetails(movieDetails: MovieDetails) {
         self.title = movieDetails.title
-        self.posterURL = movieDetails.posterURL()
         self.voteAverage = String(format: NSLocalizedString("rating", comment: ""), movieDetails.voteAverage.description)
         self.overview = movieDetails.overview
         self.releaseDate = movieDetails.formattedReleaseDate()
+        
+        DispatchQueue.main.async {
+            self.posterURL = movieDetails.posterURL()
+        }
         
         configureButton(movieDetails: movieDetails)
     }

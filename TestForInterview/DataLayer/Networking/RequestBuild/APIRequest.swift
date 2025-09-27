@@ -31,10 +31,6 @@ extension APIRequest {
     func asURLRequest() throws -> URLRequest {
         let urlComponents = NSURLComponents(string: baseURLString + path)
         
-        guard let urlRequest = urlComponents?.url else {
-            throw APIError.buildRequest(.invalidURL)
-        }
-        
         if let parametrsArray = parametrs, !parametrsArray.isEmpty {
             urlComponents?.queryItems = []
             
@@ -42,6 +38,10 @@ extension APIRequest {
                 let item = URLQueryItem(name: parametr.key, value: "\(parametr.value)")
                 urlComponents?.queryItems?.append(item)
             }
+        }
+        
+        guard let urlRequest = urlComponents?.url else {
+            throw APIError.buildRequest(.invalidURL)
         }
         
         var request = try URLRequest(

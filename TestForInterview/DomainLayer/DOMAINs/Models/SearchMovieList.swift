@@ -1,17 +1,17 @@
 //
-//  TopRatedList.swift
+//  SearchMovieList.swift
 //  TestForInterview
 //
-//  Created by Vashchenia Volodymyr on 24.09.2025.
+//  Created by Vashchenia Volodymyr on 26.09.2025.
 //
 
-struct TopRatedList: Hashable {
+struct SearchMovieList: Hashable {
     let page: Int
     let movies: [Movie]
     let totalPages: Int
     let totalResults: Int
     
-    init(dto: TopRatedListDTO) {
+    init(dto: SearchMovieListDTO) {
         self.page = dto.page
         self.movies = dto.results.map { $0.domain() }
         self.totalPages = dto.total_pages

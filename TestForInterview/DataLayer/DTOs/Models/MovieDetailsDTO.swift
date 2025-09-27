@@ -7,17 +7,17 @@
 
 struct MovieDetailsDTO: Responsable, DTOConvertible, DOMAINConvertible {
     let adult: Bool
-    let backdrop_path: String
+    let backdrop_path: String?
     let budget: Int
     let genres: [GenreDTO]
     let homepage: String
     let id: Int
-    let imdb_id: String
+    let imdb_id: String?
     let original_language: String
     let original_title: String
     let overview: String
     let popularity: Double
-    let poster_path: String
+    let poster_path: String?
     
     let production_companies: [ProductionCompanyDTO]
     let production_countries: [ProductionCountryDTO]

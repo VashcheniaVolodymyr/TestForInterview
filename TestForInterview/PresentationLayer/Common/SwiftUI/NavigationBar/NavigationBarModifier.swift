@@ -20,10 +20,11 @@ struct NavigationBarModifier: ViewModifier {
                     style: style,
                     customAction: customAction
                 )
-                .padding(.horizontal, 24)
+                .padding(.horizontal, 16)
                 content
             }
             .navigationBarHidden(true)
+            .animation(.easeInOut, value: title)
         }
     }
     

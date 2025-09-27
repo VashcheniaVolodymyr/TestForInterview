@@ -38,7 +38,7 @@ struct NavigationBar: View {
                             .foregroundColor(Color(.txt))
                             .frame(width: 24, height: 24)
                     }
-                    .frame(width: 24, alignment: .leading)
+                    .frame(width: 24, alignment: .topLeading)
                     
                     Text(title ?? "")
                         .font(getFont())
@@ -51,7 +51,6 @@ struct NavigationBar: View {
             }
         }
         .padding(.vertical, 8)
-        .fixedSize(horizontal: false, vertical: true)
     }
 
     init(

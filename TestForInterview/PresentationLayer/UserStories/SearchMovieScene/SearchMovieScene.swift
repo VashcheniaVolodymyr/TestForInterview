@@ -29,11 +29,14 @@ struct SearchMovieScene<ViewModel: SearchMovieSceneVMP>: View {
                         .frame(height: 260)
                         
                         Spacer()
+                    } else if viewModel.firstPageLoading {
+                        LoaderView()
                     } else {
                         collectionView
                     }
                 }
                 .animation(.easeInOut(duration: 0.3), value: viewModel.nothingFound)
+                .animation(.easeInOut(duration: 0.3), value: viewModel.firstPageLoading)
                 
                 Spacer()
             }

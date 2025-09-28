@@ -9,36 +9,56 @@ import SwiftUI
 
 struct MovieDetailsScene<ViewModel: MovieDetailsSceneVMP>: View {
     @ObservedObject var viewModel: ViewModel
+    @State var loader: Bool = true
     
     var body: some View {
         ZStack {
             Color(.bg)
-            ScrollView(.vertical, showsIndicators: false) {
-                VStack(spacing: 20) {
-                    posterView
-                    
-                    Text(viewModel.overview)
-                        .foregroundColor(Color(.txt))
-                        .multilineTextAlignment(.leading)
-                        .font(.system(size: 12))
-                        .fixedSize(horizontal: false, vertical: true)
-                    
-                    Text(viewModel.releaseDate)
-                        .foregroundColor(Color(.txt))
-                        .font(.system(size: 12))
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    
-                    AppButton(config: viewModel.configurableAppButton.config, style: viewModel.configurableAppButton.style)
-                        .id(viewModel.configurableAppButton.id)
-                    Spacer()
+            switch viewModel.state {
+            case .loaded:
+                VStack {
+                    ScrollView(.vertical, showsIndicators: false) {
+                        posterContent
+                    }
                 }
-                .padding(.horizontal, 16)
-                .padding(.top, 20)
+                .animation(.easeInOut, value: viewModel.state)
+            case .loading:
+                LoaderView()
+                    .animation(.easeIn, value: viewModel.state)
+            case .error(let errorMessage):
+                Text(errorMessage)
+                    .font(.system(size: 24, weight: .bold))
+                    .foregroundColor(Color(.txt))
+            case .initial:
+                EmptyView()
             }
         }
         .modifier(NavigationBarModifier(title: viewModel.title))
     }
     
+    
+    private var posterContent: some View {
+        VStack(spacing: 20) {
+            posterView
+            
+            Text(viewModel.overview)
+                .foregroundColor(Color(.txt))
+                .multilineTextAlignment(.leading)
+                .font(.system(size: 12))
+                .fixedSize(horizontal: false, vertical: true)
+            
+            Text(viewModel.releaseDate)
+                .foregroundColor(Color(.txt))
+                .font(.system(size: 12))
+                .frame(maxWidth: .infinity, alignment: .leading)
+            
+            AppButton(config: viewModel.configurableAppButton.config, style: viewModel.configurableAppButton.style)
+                .id(viewModel.configurableAppButton.id)
+            Spacer()
+        }
+        .padding(.horizontal, 16)
+        .padding(.top, 20)
+    }
     
     private var posterView: some View {
         VStack(spacing: 8) {

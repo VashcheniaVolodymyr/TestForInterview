@@ -26,6 +26,7 @@ protocol SearchMovieSceneVMP: ObservableObject {
     var searchResult: String { get }
     var movies: [SearchMovieItem] { get }
     var nothingFound: Bool { get }
+    var firstPageLoading: Bool { get }
     
     func didSelectMovie(_ movie: SearchMovieItem)
     func loadNextPage()
@@ -39,6 +40,7 @@ final class SearchMovieSceneViewModel: SearchMovieSceneVMP {
     @Published var searchResult: String = String(format: NSLocalizedString("search_results", comment: ""), "0")
     @Published var movies: [SearchMovieItem] = []
     @Published var nothingFound: Bool = false
+    @Published var firstPageLoading: Bool = false
     
     // MARK: Private
     private var cancellables: Set<AnyCancellable> = []
@@ -71,6 +73,31 @@ final class SearchMovieSceneViewModel: SearchMovieSceneVMP {
             case (0, 0, .done, true):
                 return true
             case (1, 0, .done, true):
+                return true
+            default:
+                return false
+            }
+        }
+        .removeDuplicates()
+        .eraseToAnyPublisher()
+    }
+    
+    private var fistPageLoading: AnyPublisher<Bool, Never> {
+        guard let paginator else {
+            return Just(false).eraseToAnyPublisher()
+        }
+        
+        return Publishers.CombineLatest3(
+            paginator.$currentPage,
+            paginator.$items,
+            paginator.$status
+        )
+        .map { page, items, status in
+            
+            switch (page, items.count, status) {
+            case (0, 0, .inProgress):
+                return true
+            case (1, 0, .inProgress):
                 return true
             default:
                 return false
@@ -171,6 +198,15 @@ final class SearchMovieSceneViewModel: SearchMovieSceneVMP {
             .sink(receiveValue: { [weak self] state in
                 guard let self = self else { return }
                 self.nothingFound = state
+            })
+            .store(in: &cancellables)
+        
+        fistPageLoading
+            .removeDuplicates()
+            .receive(on: DispatchQueue.main)
+            .sink(receiveValue: { [weak self] state in
+                guard let self = self else { return }
+                self.firstPageLoading = state
             })
             .store(in: &cancellables)
     }

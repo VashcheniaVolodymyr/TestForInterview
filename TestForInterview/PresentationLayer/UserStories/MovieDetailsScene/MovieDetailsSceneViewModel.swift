@@ -7,11 +7,20 @@
 
 import Foundation
 
-enum MovieDetailsSceneState {
+enum MovieDetailsSceneState: Hashable {
     case initial
     case error(String)
     case loading
     case loaded
+    
+    static func ==(lhs: MovieDetailsSceneState, rhs: MovieDetailsSceneState) -> Bool {
+        switch (lhs, rhs) {
+        case (.initial, .initial): return true
+        case (.error(let lhsMsg), .error(let rhsMsg)): return lhsMsg == rhsMsg
+        case (.loading, .loading), (.loaded, .loaded): return true
+        default: return false
+        }
+    }
 }
 
 protocol MovieDetailsSceneVMP: ObservableObject {
@@ -57,12 +66,13 @@ final class MovieDetailsSceneViewModel: MovieDetailsSceneVMP {
                 receiveCompletion: { [weak self] status in
                     switch status {
                     case .finished:
-                        self?.state = .loaded
+                        break
                     case .failure(let failure):
                         self?.state = .error(failure.clientMessage)
                     }
                 }, receiveValue: { [weak self] details in
                     self?.setUpDetails(movieDetails: details)
+                    self?.state = .loaded
                 }
             )
     }

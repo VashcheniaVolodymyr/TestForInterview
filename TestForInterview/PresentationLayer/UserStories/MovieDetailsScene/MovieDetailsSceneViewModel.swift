@@ -30,7 +30,8 @@ protocol MovieDetailsSceneVMP: ObservableObject {
     var overview: String { get }
     var releaseDate: String { get }
     var state: MovieDetailsSceneState { get }
-    var configurableAppButton: ConfigurableAppButton { get }
+    var appButtonConfig: AppButton.Config { get }
+    func onAppear()
 }
 
 final class MovieDetailsSceneViewModel: MovieDetailsSceneVMP {
@@ -41,17 +42,26 @@ final class MovieDetailsSceneViewModel: MovieDetailsSceneVMP {
     @Published var overview: String = ""
     @Published var releaseDate: String = ""
     @Published var state: MovieDetailsSceneState = .initial
-    @Published var configurableAppButton: ConfigurableAppButton = .init(config: .empty, style: .primary)
+    @Published var appButtonConfig: AppButton.Config = .empty
     
     // MARK: Private
     private let movieId: Int32
     private let movieRepository: MoviesRepository
+    private let favoriteRepository: FavoriteRepository
     
     // MARK: Initialization
-    init(movieId: Int32, movieRepository: MoviesRepository = MoviesRepositoryImpl()) {
+    init(
+        movieId: Int32,
+        movieRepository: MoviesRepository = MoviesRepositoryImpl(),
+        favoriteRepository: FavoriteRepository = FavoriteRepositoryImpl()
+    ) {
         self.movieId = movieId
         self.movieRepository = movieRepository
-        
+        self.favoriteRepository = favoriteRepository
+    }
+    
+    // MARK: Lifecycle
+    func onAppear() {
         loadDetails()
     }
     
@@ -91,18 +101,20 @@ final class MovieDetailsSceneViewModel: MovieDetailsSceneVMP {
     }
     
     private func configureButton(movieDetails: MovieDetails) {
-        let isFavorite = false
+        let isFavorite = favoriteRepository.isFavorite(movieDetails)
         let title = isFavorite ? NSLocalizedString("remove_from_favorites", comment: "") : NSLocalizedString("add_to_favorites", comment: "")
         
         let action: VoidCallBack = {
             if isFavorite {
-                // remove from favorites
+                self.favoriteRepository.removeFavorite(movieDetails)
             } else {
-                // add to favorites
+                self.favoriteRepository.addFavorite(movieDetails)
             }
+            
+            self.configureButton(movieDetails: movieDetails)
         }
         
         let style: AppButton.Style = isFavorite ? .secondary : .primary
-        self.configurableAppButton = .init(config: .init(title: title, action: action), style: style)
+        self.appButtonConfig = .init(title: title, style: style, action: action)
     }
 }

@@ -21,6 +21,7 @@ struct NavigationBarModifier: ViewModifier {
                     customAction: customAction
                 )
                 .padding(.horizontal, 16)
+                .fixedSize(horizontal: false, vertical: true)
                 content
             }
             .navigationBarHidden(true)

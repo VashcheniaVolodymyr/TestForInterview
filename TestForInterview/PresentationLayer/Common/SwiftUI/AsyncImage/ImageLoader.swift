@@ -22,8 +22,6 @@ final class ImageLoader: ObservableObject {
         self.scale = scale
     }
     
-    deinit {}
-    
     func loadImage() {
         guard let url = url, asyncImagePhase.image == nil else { return }
         downloadTask = ImageService.shared.fetchImage(url: url, scale: scale) {

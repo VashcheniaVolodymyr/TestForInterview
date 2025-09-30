@@ -50,7 +50,6 @@ struct NavigationBar: View {
                 }
             }
         }
-        .padding(.vertical, 8)
     }
 
     init(

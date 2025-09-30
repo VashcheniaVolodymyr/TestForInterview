@@ -40,6 +40,7 @@ final class Navigation: Injectable {
     // MARK: Public methods
     func start(window: UIWindow) {
         self.window = window
+        self.navigate(builder: Scenes.dashboard())
     }
     
     func navigate<SceneBuilder>(builder: SceneBuilder, completion: VoidCallBack? = nil)

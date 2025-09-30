@@ -8,7 +8,7 @@
 import Foundation
 import Combine
 
-struct SearchMovieItem: Hashable, Identifiable {
+struct MovieItem: Hashable, Identifiable {
     let id: Int
     let isFavorite: Bool
     let item: Movie
@@ -24,11 +24,12 @@ protocol SearchMovieSceneVMP: ObservableObject {
     var title: String { get }
     var input: String { get set }
     var searchResult: String { get }
-    var movies: [SearchMovieItem] { get }
+    var movies: [MovieItem] { get }
     var nothingFound: Bool { get }
     var firstPageLoading: Bool { get }
     
-    func didSelectMovie(_ movie: SearchMovieItem)
+    func onAppear()
+    func didSelectMovie(_ movie: MovieItem)
     func loadNextPage()
 }
 
@@ -38,7 +39,7 @@ final class SearchMovieSceneViewModel: SearchMovieSceneVMP {
    
     @Published var input: String = ""
     @Published var searchResult: String = String(format: NSLocalizedString("search_results", comment: ""), "0")
-    @Published var movies: [SearchMovieItem] = []
+    @Published var movies: [MovieItem] = []
     @Published var nothingFound: Bool = false
     @Published var firstPageLoading: Bool = false
     
@@ -126,11 +127,15 @@ final class SearchMovieSceneViewModel: SearchMovieSceneVMP {
     }
     
     // MARK: Protocol
+    func onAppear() {
+        updateFavorites()
+    }
+    
     func loadNextPage() {
         self.paginator?.loadNextPage()
     }
     
-    func didSelectMovie(_ movie: SearchMovieItem) {
+    func didSelectMovie(_ movie: MovieItem) {
         self.navigation.navigate(builder: Scenes.movieDetails(movieId: Int32(movie.item.id)))
     }
     
@@ -179,7 +184,7 @@ final class SearchMovieSceneViewModel: SearchMovieSceneVMP {
                 self.movies = movies.uniqueBy(\.id).map {
                     let isFaforite = self.favoriteRepository.isFavorite($0)
                     
-                    return SearchMovieItem(isFavorite: isFaforite, item: $0)
+                    return MovieItem(isFavorite: isFaforite, item: $0)
                 }
             })
             .store(in: &cancellables)
@@ -209,5 +214,15 @@ final class SearchMovieSceneViewModel: SearchMovieSceneVMP {
                 self.firstPageLoading = state
             })
             .store(in: &cancellables)
+    }
+    
+    private func updateFavorites() {
+        if movies.count > 0 {
+            self.movies = paginator?.items.uniqueBy(\.id).map {
+                let isFaforite = self.favoriteRepository.isFavorite($0)
+                
+                return MovieItem(isFavorite: isFaforite, item: $0)
+            } ?? []
+        }
     }
 }

@@ -23,7 +23,7 @@ public enum AsyncImagePhase {
     }
 }
 
-public struct CAsyncImage<Content: View>: View {
+public struct CAsyncImage<Content: View>: View, Equatable {
     @ObservedObject var loader: ImageLoader
     var content: ((AsyncImagePhase) -> Content)?
     
@@ -64,7 +64,7 @@ public struct CAsyncImage<Content: View>: View {
             }
         }
     }
-
+    
     public init(
         url: URL?,
         scale: CGFloat = 1,
@@ -73,5 +73,9 @@ public struct CAsyncImage<Content: View>: View {
     ) {
         self.content = content
         loader = ImageLoader(url: url, scale: scale)
+    }
+    
+    public static func == (lhs: CAsyncImage, rhs: CAsyncImage) -> Bool {
+        lhs.loader.url == rhs.loader.url
     }
 }

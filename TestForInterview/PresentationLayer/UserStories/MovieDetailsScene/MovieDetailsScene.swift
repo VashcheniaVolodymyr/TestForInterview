@@ -14,26 +14,28 @@ struct MovieDetailsScene<ViewModel: MovieDetailsSceneVMP>: View {
     var body: some View {
         ZStack {
             Color(.bg)
-            switch viewModel.state {
-            case .loaded:
-                VStack {
-                    ScrollView(.vertical, showsIndicators: false) {
-                        posterContent
+            VStack {
+                switch viewModel.state {
+                case .loaded:
+                    VStack {
+                        ScrollView(.vertical, showsIndicators: false) {
+                            posterContent
+                        }
                     }
+                case .loading:
+                    LoaderView()
+                case .error(let errorMessage):
+                    Text(errorMessage)
+                        .font(.system(size: 24, weight: .bold))
+                        .foregroundColor(Color(.txt))
+                case .initial:
+                    EmptyView()
                 }
-                .animation(.easeInOut, value: viewModel.state)
-            case .loading:
-                LoaderView()
-                    .animation(.easeIn, value: viewModel.state)
-            case .error(let errorMessage):
-                Text(errorMessage)
-                    .font(.system(size: 24, weight: .bold))
-                    .foregroundColor(Color(.txt))
-            case .initial:
-                EmptyView()
             }
+            .animation(.easeIn(duration: 0.3), value: viewModel.state)
         }
         .modifier(NavigationBarModifier(title: viewModel.title))
+        .onAppear(perform: viewModel.onAppear)
     }
     
     
@@ -52,8 +54,7 @@ struct MovieDetailsScene<ViewModel: MovieDetailsSceneVMP>: View {
                 .font(.system(size: 12))
                 .frame(maxWidth: .infinity, alignment: .leading)
             
-            AppButton(config: viewModel.configurableAppButton.config, style: viewModel.configurableAppButton.style)
-                .id(viewModel.configurableAppButton.id)
+            AppButton(config: viewModel.appButtonConfig)
             Spacer()
         }
         .padding(.horizontal, 16)
@@ -72,7 +73,7 @@ struct MovieDetailsScene<ViewModel: MovieDetailsSceneVMP>: View {
                     .foregroundColor(Color.gray.opacity(0.2))
                     .frame(width: 250, height: 377)
             }
-            .id(viewModel.posterURL?.absoluteString)
+            .equatable()
             
             Text(viewModel.voteAverage)
                 .foregroundColor(Color(.txt))

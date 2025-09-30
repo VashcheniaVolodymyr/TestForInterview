@@ -6,21 +6,26 @@
 //
 import SwiftUI
 
-struct ConfigurableAppButton: Identifiable {
-    let id: String = UUID().uuidString
-    let config: AppButton.Config
-    let style: AppButton.Style
-}
-
 struct AppButton: View {
     struct Config: Hashable, Identifiable {
-        let id: String = UUID().uuidString
+        let id: String
         let title: String
         let action: VoidCallBack?
+        let style: Style
+        let size: Size
         
-        init(title: String, action: VoidCallBack?) {
+        init(
+            id: String = UUID().uuidString,
+            title: String,
+            style: Style = .primary,
+            size: Size = .SizeM,
+            action: VoidCallBack? = nil
+        ) {
+            self.id = id
             self.title = title
             self.action = action
+            self.style = style
+            self.size = size
         }
       
         static let empty: Config = .init(title: "", action: nil)
@@ -28,11 +33,16 @@ struct AppButton: View {
         func hash(into hasher: inout Hasher) {
             hasher.combine(title)
             hasher.combine(action.notNil)
+            hasher.combine(style)
+            hasher.combine(id)
+            hasher.combine(size)
         }
         
         static func == (lhs: Config, rhs: Config) -> Bool {
             return lhs.title == rhs.title
             && lhs.action.notNil == rhs.action.notNil
+            && lhs.style == rhs.style
+            && lhs.id == rhs.id
         }
     }
     
@@ -53,27 +63,35 @@ struct AppButton: View {
     }
     
     let config: Config
-    let style: Style
-    let size: Size
     
     init(
-        config: Config,
+        id: String = UUID().uuidString,
+        title: String,
         style: Style = .primary,
         size: Size = .SizeM,
-        buttonTapped: VoidCallBack? = nil
+        action: VoidCallBack? = nil
     ) {
+        self.config = .init(
+            id: id,
+            title: title,
+            style: style,
+            size: size,
+            action: action
+        )
+    }
+    
+    init(config: Config) {
         self.config = config
-        self.style = style
-        self.size = size
     }
     
     var body: some View {
-        Group {
-            switch style {
+        VStack {
+            switch config.style {
             case .primary: primaryButton
             case .secondary: secondaryButton
             }
         }
+        .animation(.easeInOut(duration: 0.3), value: config.style)
     }
     
     private var primaryButton: some View {
@@ -89,8 +107,8 @@ struct AppButton: View {
             .frame(
                 minWidth: 52,
                 maxWidth: .infinity,
-                minHeight: size.rawValue,
-                maxHeight: size.rawValue
+                minHeight: config.size.rawValue,
+                maxHeight: config.size.rawValue
             )
             .background(getBackgroundColor())
             .cornerRadius(getCornerRadius())
@@ -112,8 +130,8 @@ struct AppButton: View {
             .frame(
                 minWidth: 52,
                 maxWidth: .infinity,
-                minHeight: size.rawValue,
-                maxHeight: size.rawValue
+                minHeight: config.size.rawValue,
+                maxHeight: config.size.rawValue
             )
             .background(getBackgroundColor())
             .cornerRadius(getCornerRadius())
@@ -133,7 +151,7 @@ struct AppButton: View {
         Text(config.title)
             .foregroundColor(foregroundColor())
             .frame(height: 24)
-            .font(size.font)
+            .font(config.size.font)
             .minimumScaleFactor(0.5)
     }
     
@@ -143,7 +161,7 @@ struct AppButton: View {
     }
     
     private func foregroundColor() -> Color {
-        switch style {
+        switch config.style {
         case .primary:
             return config.action.isNil
             ? Color(.btnTxt1).opacity(0.5)
@@ -156,7 +174,7 @@ struct AppButton: View {
     }
     
     private func strokeColor() -> Color {
-        switch style {
+        switch config.style {
         case .primary:
             return .clear
         case .secondary:
@@ -167,7 +185,7 @@ struct AppButton: View {
     }
     
     private func getBackgroundColor() -> Color {
-        switch style {
+        switch config.style {
         case .primary:
             return config.action.isNil
             ? Color(.btnBg1).opacity(0.5)

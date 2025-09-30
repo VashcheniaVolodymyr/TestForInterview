@@ -13,5 +13,13 @@ extension Array {
             return seen.insert(value).inserted
         }
     }
+    
+    func safelyAccessElement(at index: Int) -> Element? {
+        guard index >= 0 && index < count else {
+            return nil
+        }
+
+        return self[index]
+    }
 }
 

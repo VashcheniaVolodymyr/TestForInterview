@@ -9,7 +9,7 @@ import SwiftUI
 extension Scenes {
     static func searchMovieScene() -> any SceneBuilderProtocol {
         struct Scene: SceneBuilderProtocol {
-            var transition: SceneTransitionMethod = .root(animated: true, option: .transitionCrossDissolve)
+            var transition: SceneTransitionMethod = .push(animated: true)
             
             func buildScene() -> UIViewController {
                 let viewModel = SearchMovieSceneViewModel()

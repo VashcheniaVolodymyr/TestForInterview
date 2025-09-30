@@ -28,7 +28,7 @@ public final class CombinePaginator<Element>: ObservableObject {
     @Published public private(set) var items: [Element] = []
     @Published public private(set) var status: RequestStatus = .none
     @Published public private(set) var errorText: String?
-    @Published public private(set) var currentPage: Int = 0
+    @Published public var currentPage: Int = 0
     @Published public private(set) var totalPages: Int = 0
     @Published public private(set) var totalResults: Int = 0
     

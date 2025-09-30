@@ -173,8 +173,7 @@ extension UIViewController {
         get { objc_getAssociatedObject(self, &loaderKey) as? DotsLoaderView }
         set { objc_setAssociatedObject(self, &loaderKey, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC) }
     }
-
-    /// Показать индикатор загрузки поверх всего контроллера
+    
     func showLoader(
         dotColor: UIColor = .systemBlue,
         dotCount: Int = 12,

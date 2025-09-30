@@ -16,8 +16,6 @@ struct DotsLoader: UIViewRepresentable, Equatable {
         var duration: CFTimeInterval
         var minScale: CGFloat
         var maxScale: CGFloat
-        var minAlpha: Float = 0.25
-        var maxAlpha: Float = 1.0
     }
 
     var config: Config

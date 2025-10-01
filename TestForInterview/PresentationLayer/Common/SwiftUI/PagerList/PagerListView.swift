@@ -8,10 +8,10 @@
 import SwiftUI
 
 struct PagerListView: View {
-    var totalPages: Int
-    @State var current: Int
+    @Binding var totalPages: Int
+    @Binding var current: Int
 
-    var itemSelected: (Int) -> Void
+    var itemSelected: Callback<Int>?
     private let windowSize = 3
 
     var body: some View {
@@ -21,7 +21,6 @@ struct PagerListView: View {
             } else if totalPages <= 5 {
                 ForEach(1...totalPages, id: \.self) { pageChip($0) }
             } else {
-                // первая
                 pageChip(1)
 
                 let mid = middleWindow()
@@ -36,7 +35,6 @@ struct PagerListView: View {
                     dots
                 }
 
-                // последняя
                 pageChip(totalPages)
             }
         }
@@ -71,7 +69,7 @@ struct PagerListView: View {
     private func pageChip(_ page: Int) -> some View {
         Button {
             current = page
-            itemSelected(page)
+            itemSelected?(page)
         } label: {
             Text("\(page)")
                 .font(.system(size: 16, weight: .semibold))
@@ -85,14 +83,14 @@ struct PagerListView: View {
                     Circle()
                         .stroke(page == current ? Color.clear : Color(.btnBg2), lineWidth: 1)
                 )
-                .foregroundColor(Color(.btnTxt1))
+                .foregroundColor(Color(.btnTxt2))
         }
         .buttonStyle(.plain)
         .contentShape(Circle())
     }
 }
 
-final class PagerFooterView: UICollectionViewCell {
+final class PagerFooterView: UICollectionReusableView {
     static let reuseIdentifier = "PagerFooterView"
 
     private var host: UIHostingController<AnyView>?

@@ -12,7 +12,7 @@ final class CombineCollectionViewDataSource<Element: Hashable>:
 
     // MARK: Types
     typealias CellBuilder = (UICollectionView, IndexPath, Element) -> UICollectionViewCell
-    typealias FooterBuilder = (UICollectionView, IndexPath) -> UICollectionViewCell
+    typealias FooterBuilder = (UICollectionView, IndexPath) -> UICollectionReusableView
     typealias ActionBuilder = Callback<Element>
 
     // MARK: Input

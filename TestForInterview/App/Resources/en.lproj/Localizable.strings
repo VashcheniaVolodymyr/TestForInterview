@@ -12,3 +12,4 @@
 "remove_from_favorites" = "Remove from favorites";
 "search" = "Search";
 "search_results" = "Search results (%@)";
+"average_rating" = "AVG Rating %.2f";

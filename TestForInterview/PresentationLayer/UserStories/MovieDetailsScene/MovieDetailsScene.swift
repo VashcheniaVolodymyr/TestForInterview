@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SDWebImage
 
 struct MovieDetailsScene<ViewModel: MovieDetailsSceneVMP>: View {
     @ObservedObject var viewModel: ViewModel
@@ -63,22 +64,38 @@ struct MovieDetailsScene<ViewModel: MovieDetailsSceneVMP>: View {
     
     private var posterView: some View {
         VStack(spacing: 8) {
-            CAsyncImage(url: viewModel.posterURL) { image in
-                image
-                    .resizable()
-                    .cornerRadius(12)
-                    .frame(width: 250, height: 377)
-            } placeholder: {
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .foregroundColor(Color.gray.opacity(0.2))
-                    .frame(width: 250, height: 377)
-            }
-            .equatable()
+            SDWebImageView(
+                url: viewModel.posterURL,
+                placeholder: nil,
+                contentMode: .center,
+                cornerRadius: 14,
+                context: imageContext,
+                showsActivity: true,
+                transition: .fade
+            )
+            .frame(width: 250, height: 377)
             
             Text(viewModel.voteAverage)
                 .foregroundColor(Color(.txt))
                 .font(.system(size: 10, weight: .medium))
         }
+    }
+    
+    private var imageContext: [SDWebImageContextOption : Any] {
+        let imageResizingTransformer = SDImageResizingTransformer(
+            size: CGSize(width: 250, height: 377),
+            scaleMode: .aspectFill
+        )
+        let round  = SDImageRoundCornerTransformer(radius: 12,
+                                                   corners: .allCorners,
+                                                   borderWidth: 0,
+                                                   borderColor: nil)
+
+        let tint = SDImageTintTransformer(color: .clear)
+
+        let pipeline = SDImagePipelineTransformer(transformers: [imageResizingTransformer, round, tint])
+        
+        return [.imageTransformer : pipeline]
     }
 }
 

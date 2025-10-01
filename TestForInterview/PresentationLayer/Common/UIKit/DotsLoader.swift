@@ -13,7 +13,7 @@ final class DotsLoaderView: UIView {
     var dotSize: CGFloat = 8 { didSet { layoutDot() } }
     var radius: CGFloat = 18 { didSet { layoutDot() } }
     var duration: CFTimeInterval = 0.9 { didSet { reconfigure(keepPhase: true) } }
-    var minScale: CGFloat = 0.4 { didSet { updateScaleAnimation(keepPhase: true) } }
+    var minScale: CGFloat = 0.35 { didSet { updateScaleAnimation(keepPhase: true) } }
     var maxScale: CGFloat = 1.0 { didSet { updateScaleAnimation(keepPhase: true) } }
 
     // MARK: Private
@@ -175,11 +175,11 @@ extension UIViewController {
     }
     
     func showLoader(
-        dotColor: UIColor = .systemBlue,
-        dotCount: Int = 12,
+        dotColor: UIColor = UIColor(resource: .txt),
+        dotCount: Int = 8,
         radius: CGFloat = 18,
-        dotSize: CGFloat = 8,
-        duration: CFTimeInterval = 0.9
+        dotSize: CGFloat = 10,
+        duration: CFTimeInterval = 0.75
     ) {
         if let loader = dotsLoader {
             view.bringSubviewToFront(loader)
@@ -207,7 +207,13 @@ extension UIViewController {
 
     func hideLoader() {
         guard let loader = dotsLoader else { return }
-        loader.removeFromSuperview()
+        if Thread.current.isMainThread {
+            loader.removeFromSuperview()
+        } else {
+            DispatchQueue.main.async {
+                loader.removeFromSuperview()
+            }
+        }
         dotsLoader = nil
     }
 }

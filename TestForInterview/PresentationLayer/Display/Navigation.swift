@@ -6,9 +6,11 @@
 //
 
 import UIKit
+import Combine
 
 final class Navigation: Injectable {
     // MARK: Private
+    private var cancellables: Set<AnyCancellable> = []
     private lazy var window: UIWindow = UIWindow()
     private lazy var currentNavigationController: UINavigationController = .init()
     
@@ -26,7 +28,16 @@ final class Navigation: Injectable {
     }()
     
     // MARK: Init
-    init() { }
+    init() {
+        ThemeManager.shared.interfaceStylePublisher
+            .removeDuplicates()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] theme in
+                guard let self = self else { return }
+                self.applyTheme(theme: theme)
+            }
+            .store(in: &cancellables)
+    }
     
     convenience init(
         window: UIWindow = UIWindow(),
@@ -40,7 +51,9 @@ final class Navigation: Injectable {
     // MARK: Public methods
     func start(window: UIWindow) {
         self.window = window
-        self.navigate(builder: Scenes.dashboard())
+        self.navigate(builder: Scenes.launchScene(duration: 2, finished: { [weak self] in
+            self?.navigate(builder: Scenes.dashboard())
+        }))
     }
     
     func navigate<SceneBuilder>(builder: SceneBuilder, completion: VoidCallBack? = nil)
@@ -102,6 +115,17 @@ final class Navigation: Injectable {
                 window.makeKeyAndVisible()
                 completion?()
             }
+        }
+    }
+    
+    private func applyTheme(theme: UIUserInterfaceStyle) {
+        UIView.transition(
+            with: self.window,
+            duration: 0.3,
+            options: .transitionCrossDissolve
+        ) { [weak self] in
+            guard let self = self else { return }
+            self.window.overrideUserInterfaceStyle = theme
         }
     }
 }

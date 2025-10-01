@@ -8,7 +8,7 @@
 import SwiftUI
 import UIKit
 
-/// Reusable SwiftUI wrapper for UICollectionView (iOS 13+)
+// Reusable SwiftUI wrapper for UICollectionView (iOS 13+)
 public struct CollectionView<Item: Identifiable & Hashable, Cell: View>: UIViewRepresentable {
     public typealias SectionID = Int
 
@@ -51,7 +51,9 @@ public struct CollectionView<Item: Identifiable & Hashable, Cell: View>: UIViewR
         collection.delegate = context.coordinator
         collection.register(HostingCollectionViewCell.self,
                             forCellWithReuseIdentifier: HostingCollectionViewCell.reuseID)
+        collection.contentInset = .zero
         context.coordinator.configureDataSource(for: collection)
+        
         return collection
     }
 
@@ -139,3 +141,4 @@ final class HostingCollectionViewCell: UICollectionViewCell {
         ])
     }
 }
+

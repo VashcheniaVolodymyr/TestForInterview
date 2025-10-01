@@ -47,7 +47,6 @@ public class BaseNetworkService: NetworkService {
                         throw APIError.response(.clientError(statusCode: httpResponse.statusCode, data: result.data))
                     }
                     
-                    print(result.data.prettyPrintedJSONString)
                     return (result.data, httpResponse)
                 }
                 .mapError { $0.asAPIError(request: request) }

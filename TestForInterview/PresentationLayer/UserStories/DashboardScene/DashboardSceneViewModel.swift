@@ -12,7 +12,9 @@ protocol DashboardSceneVMP: AnyObject {
     var totalPages: Int { get }
     var isLoadingState: AnyPublisher<Bool, Never> { get }
     var currentSelectedPage: Int { get }
+    var averageRating: AnyPublisher<Double, Never> { get }
     func didSelectPage(page: Int)
+    func refresh()
     func viewDidLoad()
     func viewWillAppear()
 }
@@ -21,13 +23,23 @@ final class DashboardSceneViewModel: DashboardSceneVMP {
     var movies: CurrentValueSubject<[MovieItem], Never> = .init([])
     var currentSelectedPage: Int = 1
     
+    var averageRating: AnyPublisher<Double, Never> {
+        return movies.map { movies -> Double in
+            let ratings = movies.map { $0.item.voteAverage }
+            guard ratings.isEmpty.NOT else { return 0 }
+            let sum = ratings.reduce(0, +)
+            return sum / Double(ratings.count)
+        }
+        .eraseToAnyPublisher()
+    }
+    
     var isLoadingState: AnyPublisher<Bool, Never> {
         guard let paginator = self.paginator else {
             return Just(false).eraseToAnyPublisher()
         }
         
         return Publishers.CombineLatest3(
-            paginator.$currentPage,
+            paginator.$selectedPage,
             paginator.$items,
             paginator.$status
         )
@@ -58,7 +70,7 @@ final class DashboardSceneViewModel: DashboardSceneVMP {
     private var cancellables: Set<AnyCancellable> = []
     private let moviesRepository: MoviesRepository
     private let favoriteRepository: FavoriteRepository
-    private var paginator: CombinePaginator<Movie>?
+    private var paginator: DualStreamPaginator<Movie>?
     private var update: PassthroughSubject<Void, Never> = .init()
     
     private lazy var region: String = {
@@ -86,37 +98,39 @@ final class DashboardSceneViewModel: DashboardSceneVMP {
     }
     
     func viewDidLoad() {
-        self.paginator?.fetchFirstPage()
+        self.paginator?.fetchFirst()
     }
     
     // MARK: Public methods
+    func refresh() {
+        self.paginator?.reset()
+        self.paginator?.fetchFirst(start: .firstPage)
+    }
+    
     func didSelectPage(page: Int) {
         self.currentSelectedPage = page
-        self.paginator?.currentPage = page - 1
-        self.paginator?.loadNextPage()
+        self.paginator?.load(page: page)
     }
     
     // MARK: Private methods
     private func configure() {
-        self.paginator = CombinePaginator<Movie>(
-            fetch: { [weak self] page in
-                guard let self = self else {
-                    return Fail(error: URLError(.badServerResponse)).eraseToAnyPublisher()
-                }
-                
-                return self.moviesRepository.topRated(language: Locale.current.identifier, page: Int32(page), region: self.region)
-                    .map({ list in
-                        return Page<Movie>(
-                            page: list.page,
-                            totalPages: list.totalPages,
-                            totalResults: list.totalResults,
-                            items: list.movies
-                        )
-                    })
-                    .mapError { $0 as Error }
-                    .eraseToAnyPublisher()
+        self.paginator = DualStreamPaginator(fetch: { [weak self] page in
+            guard let self = self else {
+                return Fail(error: URLError(.badServerResponse)).eraseToAnyPublisher()
             }
-        )
+            
+            return self.moviesRepository.topRated(language: Locale.current.identifier, page: Int32(page), region: self.region)
+                .map({ list in
+                    return DualPage<Movie>(
+                        page: list.page,
+                        totalPages: list.totalPages,
+                        totalResults: list.totalResults,
+                        items: list.movies
+                    )
+                })
+                .mapError { $0 as Error }
+                .eraseToAnyPublisher()
+        }, direction: .ascending)
         
         
         paginator?.$items
@@ -130,6 +144,13 @@ final class DashboardSceneViewModel: DashboardSceneVMP {
                 }
             }
             .assign(to: \.value, on: movies, ownership: .weak)
+            .store(in: &cancellables)
+        
+        paginator?.$selectedPage
+            .removeDuplicates()
+            .sink(receiveValue: { [weak self] page in
+                self?.currentSelectedPage = page
+            })
             .store(in: &cancellables)
     }
 }

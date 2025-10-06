@@ -50,7 +50,7 @@ public struct CollectionView<Item: Identifiable & Hashable, Cell: View>: UIViewR
         collection.isScrollEnabled = isScrollEnabled
         collection.delegate = context.coordinator
         collection.register(HostingCollectionViewCell.self,
-                            forCellWithReuseIdentifier: HostingCollectionViewCell.reuseID)
+                            forCellWithReuseIdentifier: HostingCollectionViewCell.identifier)
         collection.contentInset = .zero
         context.coordinator.configureDataSource(for: collection)
         
@@ -72,8 +72,7 @@ public struct CollectionView<Item: Identifiable & Hashable, Cell: View>: UIViewR
 
         func configureDataSource(for collectionView: UICollectionView) {
             dataSource = .init(collectionView: collectionView) { [weak self] cv, indexPath, item in
-                let cell = cv.dequeueReusableCell(withReuseIdentifier: HostingCollectionViewCell.reuseID,
-                                                  for: indexPath) as! HostingCollectionViewCell
+                let cell: HostingCollectionViewCell = cv.dequeueCell(with: HostingCollectionViewCell.self, for: indexPath)
                 guard let strong = self else { return cell }
                 cell.set(strong.parent.cell(item))
                 return cell
@@ -115,7 +114,6 @@ public struct CollectionView<Item: Identifiable & Hashable, Cell: View>: UIViewR
 
 // MARK: - Internal hosting cell that embeds SwiftUI
 final class HostingCollectionViewCell: UICollectionViewCell {
-    static let reuseID = "HostingCollectionViewCell"
     private var host: UIHostingController<AnyView>?
 
     override func prepareForReuse() {

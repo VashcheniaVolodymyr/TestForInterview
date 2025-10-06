@@ -7,6 +7,4 @@
 
 import UIKit
 
-final class EmptyFooterView: UICollectionReusableView {
-    static let reuseIdentifier = "EmptyFooterView"
-}
+final class EmptyFooterView: UICollectionReusableView { }

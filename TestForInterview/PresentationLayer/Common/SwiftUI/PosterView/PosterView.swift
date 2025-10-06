@@ -68,8 +68,6 @@ struct PosterViewSwiftUI: View {
 }
 
 final class PosterHostingCell: UICollectionViewCell {
-    static let reuseID = "PosterHostingCell"
-    
     private var host: UIHostingController<PosterViewSwiftUI>?
     
     override init(frame: CGRect) {

@@ -51,11 +51,7 @@ final class CombineCollectionViewDataSource<Element: Hashable>:
     func collectionView(_ collectionView: UICollectionView,
                         cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if items.isEmpty {
-            let cell: EmptyCollectionViewCell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: EmptyCollectionViewCell.identifier,
-                for: indexPath
-            ) as! EmptyCollectionViewCell
-            return cell
+            return collectionView.dequeueCell(with: EmptyCollectionViewCell.self, for: indexPath)
         }
 
         return build(collectionView, indexPath, items[indexPath.item])
@@ -67,11 +63,7 @@ final class CombineCollectionViewDataSource<Element: Hashable>:
                         at indexPath: IndexPath) -> UICollectionReusableView {
         guard kind == UICollectionView.elementKindSectionFooter,
               let buildFooter = buildFooter else {
-            return collectionView.dequeueReusableSupplementaryView(
-                ofKind: kind,
-                withReuseIdentifier: UICollectionReusableView.identifier,
-                for: indexPath
-            )
+            return collectionView.dequeueReusableSupplementaryView(ofKind: kind, with: UICollectionReusableView.self, for: indexPath)
         }
         return buildFooter(collectionView, indexPath)
     }
@@ -81,25 +73,5 @@ final class CombineCollectionViewDataSource<Element: Hashable>:
             return
         }
         action(element)
-    }
-}
-
-extension UICollectionReusableView {
-    static var identifier: String { String(describing: self) }
-}
-
-extension UICollectionView {
-    func dequeueCell<T: UICollectionViewCell>(with type: T.Type, for indexPath: IndexPath) -> T {
-        dequeueReusableCell(withReuseIdentifier: type.identifier, for: indexPath) as! T
-    }
-
-    func dequeueReusableSupplementaryView<T: UICollectionReusableView>(ofKind kind: String,
-                                                                       with type: T.Type,
-                                                                       for indexPath: IndexPath) -> T {
-        dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: type.identifier, for: indexPath) as! T
-    }
-
-    func dequeueCell<T: UICollectionViewCell>(with _: UICollectionViewCell.Type, for indexPath: IndexPath) -> T {
-        dequeueReusableCell(withReuseIdentifier: T.identifier, for: indexPath) as! T
     }
 }

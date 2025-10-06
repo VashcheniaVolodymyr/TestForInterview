@@ -91,8 +91,6 @@ struct PagerListView: View {
 }
 
 final class PagerFooterView: UICollectionReusableView {
-    static let reuseIdentifier = "PagerFooterView"
-
     private var host: UIHostingController<AnyView>?
 
     override init(frame: CGRect) {

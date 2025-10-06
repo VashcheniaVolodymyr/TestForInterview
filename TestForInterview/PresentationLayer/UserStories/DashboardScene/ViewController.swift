@@ -109,11 +109,11 @@ class DashboardScene: UIViewController {
         collectionView.register(EmptyCollectionViewCell.self, forCellWithReuseIdentifier: EmptyCollectionViewCell.identifier)
         collectionView.register(PagerFooterView.self,
                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
-                withReuseIdentifier: PagerFooterView.reuseIdentifier)
+                                withReuseIdentifier: PagerFooterView.identifier)
         collectionView.register(
             EmptyFooterView.self,
             forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
-            withReuseIdentifier: EmptyFooterView.reuseIdentifier
+            withReuseIdentifier: EmptyFooterView.identifier
         )
         collectionView.setCollectionViewLayout(collectionLayout(), animated: false)
         
@@ -126,22 +126,16 @@ class DashboardScene: UIViewController {
             guard let self = self, self.viewModel.movies.value.isEmpty.NOT else {
                 return collectionView.dequeueReusableSupplementaryView(
                     ofKind: UICollectionView.elementKindSectionFooter,
-                    withReuseIdentifier: EmptyFooterView.reuseIdentifier,
+                    with: EmptyFooterView.self,
                     for: indexPath
                 )
             }
             
-            guard let footer = collectionView.dequeueReusableSupplementaryView(
+            let footer = collectionView.dequeueReusableSupplementaryView(
                 ofKind: UICollectionView.elementKindSectionFooter,
-                withReuseIdentifier: PagerFooterView.reuseIdentifier,
+                with: PagerFooterView.self,
                 for: indexPath
-            ) as? PagerFooterView else {
-                return collectionView.dequeueReusableSupplementaryView(
-                    ofKind: UICollectionView.elementKindSectionFooter,
-                    withReuseIdentifier: EmptyFooterView.reuseIdentifier,
-                    for: indexPath
-                )
-            }
+            )
             
             let pager = PagerListView(
                 totalPages: Binding(
